@@ -1,0 +1,26 @@
+name: Ping Sraboni Dream
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Server
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36" \
+            --max-time 30 \
+            https://sraboni-dream.onrender.com/health)
+          echo "Server status: $STATUS"
+
+      - name: Ping DB
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36" \
+            --max-time 30 \
+            https://sraboni-dream.onrender.com/api/ping-db)
+          echo "DB status: $STATUS"
