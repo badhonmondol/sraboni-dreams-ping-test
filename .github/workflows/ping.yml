@@ -1,4 +1,4 @@
-name: Ping Server
+name: Ping Sraboni Dream
 
 on:
   schedule:
@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  ping:
+  ping-server:
+    name: Ping Server
     runs-on: ubuntu-latest
     steps:
       - name: Ping Server
@@ -16,3 +17,26 @@ jobs:
             --max-time 30 \
             https://sraboni-dream.onrender.com/health)
           echo "Server status: $STATUS"
+
+  ping-db:
+    name: Ping DB (hourly)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if hourly
+        id: check
+        run: |
+          MINUTE=$(date +%M)
+          if [ "$MINUTE" = "00" ]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Ping DB
+        if: steps.check.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36" \
+            --max-time 30 \
+            https://sraboni-dream.onrender.com/api/ping-db)
+          echo "DB status: $STATUS"
